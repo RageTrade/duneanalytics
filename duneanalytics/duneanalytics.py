@@ -124,7 +124,7 @@ class DuneAnalytics:
             logger.error(response.text)
             return None
 
-    def query_result_id_v3(self, query_id):
+    def query_result_id_v3(self, query_id, **kwargs):
         """
         Fetch the query result id for a query
 
@@ -132,7 +132,7 @@ class DuneAnalytics:
         :return:
         """
         self.query_id = query_id
-        query_data = {"operationName": "GetResult", "variables": {"query_id": query_id, "parameters": []},
+        query_data = {"operationName": "GetResult", "variables": {"query_id": query_id, "parameters": kwargs['parameters'] if kwargs is not None else []},
                       "query": "query GetResult($query_id: Int!, $parameters: [Parameter!]!) "
                                "{\n  get_result_v3(query_id: $query_id, parameters: $parameters) "
                                "{\n    job_id\n    result_id\n    error_id\n    __typename\n  }\n}\n"
@@ -180,9 +180,9 @@ class DuneAnalytics:
             logger.error(response.text)
             return {}
 
-    def get_execution_result(self, execution_id):
+    def get_execution_result(self, query_id, execution_id, **kwargs):
         query_data = {"operationName": "GetExecution",
-                      "variables": {"execution_id": execution_id, "query_id": self.query_id, "parameters": []},
+                      "variables": {"execution_id": execution_id, "query_id": query_id, "parameters": kwargs['parameters'] if kwargs is not None else []},
                       "query": "query GetExecution($execution_id: String!, $query_id: Int!, $parameters: [Parameter!]!)"
                                " {\n  get_execution(\n    execution_id: $execution_id\n    query_id: $query_id\n    "
                                "parameters: $parameters\n  ) {\n    execution_queued {\n      execution_id\n      "
